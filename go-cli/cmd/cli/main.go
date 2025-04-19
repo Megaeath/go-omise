@@ -6,11 +6,11 @@ import (
 	"io/ioutil"
 	"os"
 
-	"go-cli/chargeclient"
-	"go-cli/csvreader"
-	"go-cli/decrypt"
-	"go-cli/model"
-	"go-cli/summary"
+	"go-cli/internal/chargeclient" // Corrected import path
+	"go-cli/internal/csvreader"    // Corrected import path
+	"go-cli/internal/decrypt"      // Corrected import path
+	"go-cli/internal/model"        // Corrected import path
+	"go-cli/internal/summary"      // Corrected import path
 )
 
 func main() {
