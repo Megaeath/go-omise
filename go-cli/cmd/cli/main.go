@@ -43,7 +43,7 @@ func main() {
 	bar := progressbar.New(len(rows))
 	var results []model.DonationResult
 	for _, row := range rows {
-		fmt.Println("donating to", row.Name, "for", row.AmountSubunits)
+		// fmt.Println("donating to", row.Name, "for", row.AmountSubunits)
 		ok, err := chargeclient.SendCharge(row)
 		// if err != nil {
 		// 	fmt.Println("Error sending charge:", err)
