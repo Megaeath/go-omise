@@ -6,6 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"go-api/internal/service"
+	"go-api/internal/utils"
+
 	"github.com/google/uuid"
 )
 
@@ -17,15 +20,19 @@ func ChargeHandler(c *gin.Context) {
 		return
 	}
 
-	// 🪪 Mask card
-	// maskedCard := "XXXX-XXXX-XXXX-" + req.CCNumber[len(req.CCNumber)-4:]
+	referenceID := uuid.New().String()
+	logEntry := model.ChargeRequestLog{
+		Name:        req.Name,
+		Amount:      req.AmountSubunits,
+		Status:      "queued",
+		MaskedCard:  utils.MaskCardNumber(req.CCNumber),
+		ReferenceID: referenceID,
+	}
 
-	// 🧾 Generate log ID
-	logID := uuid.NewString()
+	if err := service.LogChargeRequest(logEntry); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to log charge"})
+		return
+	}
 
-	// 📝 Simulate logging to DB and sending to Kafka (placeholder)
-	// logToDB(logID, req.Name, maskedCard, req.AmountSubunits)
-	// sendToKafka(logID, maskedCard, req.AmountSubunits)
-
-	c.JSON(http.StatusOK, model.ChargeResponse{LogID: logID})
+	c.JSON(http.StatusOK, model.ChargeResponse{LogID: referenceID})
 }

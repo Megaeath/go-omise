@@ -8,6 +8,8 @@ import (
 
 func main() {
 	config.InitRedis()
+	config.InitMongo()
+
 	r := router.SetupRouter()
 
 	log.Println("API running at :8080")
