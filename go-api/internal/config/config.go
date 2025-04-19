@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"go-api/internal/db"
+	"go-api/internal/kafka"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -28,4 +29,17 @@ func InitMongo() {
 	log.Println("Initializing MongoDB...")
 	db.InitMongoDB(mongoURI, dbName)
 	log.Println("MongoDB initialized successfully.")
+}
+
+func InitKafkaTopic() {
+	broker := "localhost:9092"
+	topic := "charge-topic"
+
+	producer := kafka.NewProducer(broker, topic)
+	defer producer.Close()
+
+	err := kafka.EnsureTopic(broker, topic, 1, 1)
+	if err != nil {
+		log.Fatalf("Failed to ensure topic: %v", err)
+	}
 }

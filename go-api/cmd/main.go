@@ -9,7 +9,8 @@ import (
 func main() {
 	config.InitRedis()
 	config.InitMongo()
-
+	config.InitKafkaTopic()
+	
 	r := router.SetupRouter()
 
 	log.Println("API running at :8080")
