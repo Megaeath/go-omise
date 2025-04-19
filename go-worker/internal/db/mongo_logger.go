@@ -2,9 +2,11 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -23,7 +25,7 @@ func NewMongoLogger(ctx context.Context, uri, dbName, collectionName string) (*M
 	return &MongoLogger{collection: coll}, nil
 }
 
-func (l *MongoLogger) LogChargeProcess(ctx context.Context, logID, status string, amount int64, message string) (interface{}, error) {
+func (l *MongoLogger) LogChargeProcess(ctx context.Context, logID, status string, amount int, message string) (interface{}, error) {
 	doc := bson.M{
 		"log_id":          logID,
 		"status":          status,
@@ -41,6 +43,11 @@ func (l *MongoLogger) LogChargeProcess(ctx context.Context, logID, status string
 
 func (l *MongoLogger) GetLogByID(ctx context.Context, logID string) (bson.M, error) {
 	var result bson.M
-	err := l.collection.FindOne(ctx, bson.M{"log_id": logID}).Decode(&result)
-	return result, err
+	objectID, err := primitive.ObjectIDFromHex(logID)
+    if err != nil {
+        return nil, err // Return error if logID is not a valid ObjectID
+    }
+	fmt.Println("ObjectID:", objectID)
+    err = l.collection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&result)
+    return result, err
 }

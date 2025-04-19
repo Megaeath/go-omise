@@ -1,17 +1,31 @@
 package chargeclient
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
-	"math/rand"
-	"time"
-
 	"go-cli/internal/model"
+	"net/http"
 )
 
-func SendMockCharge(row model.DonationRow) (bool, error) {
-	time.Sleep(time.Duration(rand.Intn(100)) * time.Millisecond)
-	if rand.Float64() < 0.9 {
-		return true, nil
+func SendCharge(row model.DonationRow) (bool, error) {
+	// Prepare the JSON payload
+	payload, err := json.Marshal(row)
+	if err != nil {
+		return false, err
 	}
-	return false, errors.New("mock charge failed")
+
+	// Make the HTTP POST request
+	resp, err := http.Post("http://localhost:8080/api/charge", "application/json", bytes.NewBuffer(payload))
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	// Check the response status code
+	if resp.StatusCode != http.StatusOK {
+		return false, errors.New("failed to process charge: " + resp.Status)
+	}
+
+	return true, nil
 }

@@ -15,7 +15,7 @@ func TestSendMockCharge(t *testing.T) {
 		ExpMonth:       "12",
 		ExpYear:        "2030",
 	}
-	ok, _ := SendMockCharge(d)
+	ok, _ := SendCharge(d)
 	if !ok {
 		t.Log("mock failure allowed as part of simulation")
 	}

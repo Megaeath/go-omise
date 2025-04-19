@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	rateLimitWindow = 60             // seconds
-	maxRequests     = 10             // max per window
+	rateLimitWindow = 3600           // seconds
+	maxRequests     = 10000000       // max per window
 	globalKey       = "global_limit" // key for all users
 )
 
@@ -29,7 +29,7 @@ func RateLimiter() gin.HandlerFunc {
 			config.RedisClient.Expire(config.Ctx, globalKey, time.Second*rateLimitWindow)
 		}
 
-		if count > int64(maxRequests) {
+		if count > maxRequests {
 			ttl, _ := config.RedisClient.TTL(config.Ctx, globalKey).Result()
 			c.JSON(http.StatusTooManyRequests, gin.H{
 				"error":        "Rate limit exceeded",

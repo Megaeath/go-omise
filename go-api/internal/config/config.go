@@ -35,11 +35,14 @@ func InitKafkaTopic() {
 	broker := "localhost:9092"
 	topic := "charge-topic"
 
+	log.Println("Initializing Kafka producer...")
 	producer := kafka.NewProducer(broker, topic)
 	defer producer.Close()
 
+	log.Println("Ensuring Kafka topic...")
 	err := kafka.EnsureTopic(broker, topic, 1, 1)
 	if err != nil {
 		log.Fatalf("Failed to ensure topic: %v", err)
 	}
+	log.Println("Kafka topic ensured successfully.")
 }

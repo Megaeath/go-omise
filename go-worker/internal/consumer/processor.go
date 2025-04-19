@@ -3,16 +3,18 @@ package consumer
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"go-worker/internal/db"
 	"log"
 	"time"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ChargePayload struct {
 	LogID       string `json:"log_id"`
 	Name        string `json:"name"`
-	Amount      int64  `json:"amount"`
+	Amount      int  `json:"amount"`
 	ReferenceID string `json:"reference_id"`
 }
 
@@ -24,7 +26,7 @@ func ProcessChargeMessage(data []byte) {
 		log.Printf("Invalid message format: %v", err)
 		return
 	}
-
+	fmt.Println("Processing charge message:", payload)
 	// Create a context with timeout
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -43,7 +45,7 @@ func ProcessChargeMessage(data []byte) {
 		return
 	}
 
-	logEntry, err := logProducer.GetLogByID(ctx, payload.ReferenceID)
+	logEntry, err := logProducer.GetLogByID(ctx, payload.LogID)
 	if err != nil {
 		log.Printf("Failed to retrieve log entry: %v", err)
 		return
@@ -64,6 +66,8 @@ func ProcessChargeMessage(data []byte) {
 		return
 	}
 
+	// Simulate a delay of 10 seconds
+	time.Sleep(10 * time.Second)
 	// Log the processing details
 	log.Printf("Processing donation for %s, amount: %d, log entry: %v, log ID: %s", payload.Name, payload.Amount, logEntry, payload.LogID)
 }

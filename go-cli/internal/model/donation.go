@@ -1,12 +1,12 @@
 package model
 
 type DonationRow struct {
-	Name           string
-	AmountSubunits int64
-	CCNumber       string
-	CVV            string
-	ExpMonth       string
-	ExpYear        string
+	Name           string `json:"name" `
+	AmountSubunits int    `json:"amount_subunits"`
+	CCNumber       string `json:"cc_number" `
+	CVV            string `json:"cvv"`
+	ExpMonth       string `json:"exp_month" `
+	ExpYear        string `json:"exp_year" `
 }
 
 type DonationResult struct {

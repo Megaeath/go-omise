@@ -22,7 +22,8 @@ func ParseCSV(r io.Reader) ([]model.DonationRow, error) {
 		if i == 0 {
 			continue // skip header
 		}
-		amt, _ := strconv.ParseInt(rec[1], 10, 64)
+		amt64, _ := strconv.ParseInt(rec[1], 10, 64)
+		amt := int(amt64)
 		rows = append(rows, model.DonationRow{
 			Name:           rec[0],
 			AmountSubunits: amt,

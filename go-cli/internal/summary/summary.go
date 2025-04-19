@@ -8,8 +8,8 @@ import (
 )
 
 func PrintSummary(results []model.DonationResult) {
-	var successSum, failSum, total int64
-	successMap := map[string]int64{}
+	var successSum, failSum, total int
+	successMap := map[string]int{}
 	var failCount int
 
 	for _, res := range results {
@@ -27,7 +27,7 @@ func PrintSummary(results []model.DonationResult) {
 	// sort by donation
 	type kv struct {
 		Name  string
-		Total int64
+		Total int
 	}
 	var top []kv
 	for name, amt := range successMap {
@@ -42,7 +42,7 @@ func PrintSummary(results []model.DonationResult) {
 	fmt.Println("  successfully donated:", formatTHB(successSum))
 	fmt.Println("       faulty donation:", formatTHB(failSum))
 	if len(results) > 0 {
-		fmt.Println("    average per person:", formatTHB(successSum/int64(len(results))))
+		fmt.Println("    average per person:", formatTHB(successSum/int(len(results))))
 	}
 	fmt.Println("            top donors:")
 	for i := 0; i < len(top) && i < 3; i++ {
@@ -50,6 +50,6 @@ func PrintSummary(results []model.DonationResult) {
 	}
 }
 
-func formatTHB(subunits int64) string {
+func formatTHB(subunits int) string {
 	return fmt.Sprintf("THB %10.2f", float64(subunits)/100)
 }
