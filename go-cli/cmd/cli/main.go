@@ -5,13 +5,16 @@ import (
 	"fmt"
 	"go-cli/internal/chargeclient" // Corrected import path
 	"go-cli/internal/csvreader"    // Corrected import path
-	// Corrected import path
-	"go-cli/internal/model"   // Corrected import path
-	"go-cli/internal/summary" // Corrected import path
+	"go-cli/internal/model"        // Corrected import path
+	"go-cli/internal/summary"      // Corrected import path
 	"io/ioutil"
 	"os"
+	"sync"
+
 	"github.com/schollz/progressbar/v3"
 )
+
+const DefaultConcurrency = 5
 
 func main() {
 	if len(os.Args) < 2 {
@@ -40,24 +43,45 @@ func main() {
 	}
 	// fmt.Println("total rows:", len(rows))
 	fmt.Println("performing donations...")
-	bar := progressbar.New(len(rows))
-	var results []model.DonationResult
-	for _, row := range rows {
-		// fmt.Println("donating to", row.Name, "for", row.AmountSubunits)
-		ok, err := chargeclient.SendCharge(row)
-		// if err != nil {
-		// 	fmt.Println("Error sending charge:", err)
-		// } else if !ok {
-		// 	fmt.Println("Charge failed for:", row.Name)
-		// }
-		results = append(results, model.DonationResult{
-			Row:     row,
-			Success: ok,
-			Error:   err,
-		})
-		bar.Add(1)
-	}
-	fmt.Println("done.")
+	results := processDonations(rows, DefaultConcurrency)
 
 	summary.PrintSummary(results)
+}
+
+func processDonations(rows []model.DonationRow, concurrency int) []model.DonationResult {
+	if concurrency <= 0 {
+		concurrency = DefaultConcurrency
+	}
+
+	results := make([]model.DonationResult, len(rows))
+	bar := progressbar.New(len(rows))
+
+	jobs := make(chan int, len(rows))
+	var wg sync.WaitGroup
+
+	for w := 0; w < concurrency; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for i := range jobs {
+				row := rows[i]
+				ok, err := chargeclient.SendCharge(row)
+
+				results[i] = model.DonationResult{
+					Row:     row,
+					Success: ok,
+					Error:   err,
+				}
+				bar.Add(1)
+			}
+		}()
+	}
+
+	for i := range rows {
+		jobs <- i
+	}
+	close(jobs)
+
+	wg.Wait()
+	return results
 }
