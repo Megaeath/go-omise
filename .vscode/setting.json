@@ -1,0 +1,6 @@
+{
+    "go.toolsEnvVars": {
+        "GOPATH": "C:/project/private/go-project"
+    },
+    "terminal.integrated.cwd": "C:/project/private/go-project/challenges/challenge-go/"
+}
