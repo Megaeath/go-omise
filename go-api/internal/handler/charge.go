@@ -32,7 +32,8 @@ func ChargeHandler(c *gin.Context) {
 		ReferenceID: referenceID,
 	}
 
-	if err := service.LogChargeRequest(logEntry); err != nil {
+	logEntryID, err := service.LogChargeRequest(logEntry)
+	if err != nil {
 		fmt.Println("Failed to log charge:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to log charge"})
 		return
@@ -41,7 +42,11 @@ func ChargeHandler(c *gin.Context) {
 	producer := kafka.NewProducer("localhost:9092", "charge-topic") // Replace with your broker and topic
 	defer producer.Close()
 
-	msg := model.ChargeMessage{ReferenceID: referenceID}
+	msg := model.ChargeMessage{
+		LogID:  logEntryID.Hex(), // Convert ObjectID to string
+		Name:   req.Name,
+		Amount: req.AmountSubunits,
+	}
 	if err := producer.SendChargeMessage(msg); err != nil {
 		fmt.Println("Failed to send message to Kafka:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to queue charge"})

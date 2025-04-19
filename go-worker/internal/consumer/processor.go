@@ -6,6 +6,7 @@ import (
 	"go-worker/internal/db"
 	"log"
 	"time"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ChargePayload struct {
@@ -48,13 +49,21 @@ func ProcessChargeMessage(data []byte) {
 		return
 	}
 
-	// Log the charge processing status
-	err = mongoLogger.LogChargeProcess(ctx, payload.LogID, "processing", payload.Amount, "Processing donation")
+	// Log the charge processing status and retrieve the inserted document's ID
+	insertedID, err := mongoLogger.LogChargeProcess(ctx, payload.LogID, "processing", payload.Amount, "Processing donation")
 	if err != nil {
 		log.Printf("Failed to log charge process: %v", err)
 		return
 	}
 
+	// Convert insertedID to ObjectID and assign to LogID
+	if objectID, ok := insertedID.(primitive.ObjectID); ok {
+		payload.LogID = objectID.Hex()
+	} else {
+		log.Printf("Failed to convert insertedID to ObjectID")
+		return
+	}
+
 	// Log the processing details
-	log.Printf("Processing donation for %s, amount: %d, log entry: %v", payload.Name, payload.Amount, logEntry)
+	log.Printf("Processing donation for %s, amount: %d, log entry: %v, log ID: %s", payload.Name, payload.Amount, logEntry, payload.LogID)
 }

@@ -23,7 +23,7 @@ func NewMongoLogger(ctx context.Context, uri, dbName, collectionName string) (*M
 	return &MongoLogger{collection: coll}, nil
 }
 
-func (l *MongoLogger) LogChargeProcess(ctx context.Context, logID, status string, amount int64, message string) error {
+func (l *MongoLogger) LogChargeProcess(ctx context.Context, logID, status string, amount int64, message string) (interface{}, error) {
 	doc := bson.M{
 		"log_id":          logID,
 		"status":          status,
@@ -32,8 +32,11 @@ func (l *MongoLogger) LogChargeProcess(ctx context.Context, logID, status string
 		"processed_at":    time.Now().UTC(),
 	}
 
-	_, err := l.collection.InsertOne(ctx, doc)
-	return err
+	result, err := l.collection.InsertOne(ctx, doc)
+	if err != nil {
+		return nil, err
+	}
+	return result.InsertedID, nil
 }
 
 func (l *MongoLogger) GetLogByID(ctx context.Context, logID string) (bson.M, error) {
