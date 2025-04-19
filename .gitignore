@@ -1,0 +1,38 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Output of build tools
+bin/
+build/
+
+# Dependency directories
+vendor/
+
+# Go modules
+go.sum
+go.mod
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+
+# Logs and debugging
+*.log
+*.out
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.old
+
+# Kafka logs (if applicable)
+kafka-logs/
