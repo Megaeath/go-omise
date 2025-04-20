@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'kafka-exporter'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+
+  - job_name: 'mongodb-exporter'
+    static_configs:
+      - targets: ['mongodb-exporter:9216']
+
+  - job_name: 'api-service'
+    static_configs:
+      - targets: ['host.docker.internal:8080']  # or your Go API service name:port
+
+  - job_name: 'worker-service'
+    static_configs:
+      - targets: ['host.docker.internal:8081']  # adjust to actual worker port
+
+  - job_name: 'producer-service'
+    static_configs:
+      - targets: ['host.docker.internal:8082']  # adjust to your Kafka producer metrics

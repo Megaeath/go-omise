@@ -35,8 +35,36 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  # --monritoring
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
 
 
+  kafka-exporter:
+    image: danielqsj/kafka-exporter
+    environment:
+      KAFKA_SERVER: kafka:9092
+    ports:
+      - "9308:9308"
 
+  mongodb-exporter:
+    image: bitnami/mongodb-exporter:latest
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017
+    ports:
+      - "9216:9216"
 volumes:
   mongo-data:
+  grafana-data:
+    
