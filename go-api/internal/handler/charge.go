@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-api/internal/model"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
@@ -39,7 +40,17 @@ func ChargeHandler(c *gin.Context) {
 		return
 	}
 
-	producer := kafka.NewProducer("localhost:29092", "charge-topic") // Replace with your broker and topic
+	broker := os.Getenv("KAFKA_BROKER")
+	if broker == "" {
+		broker = "localhost:29092"
+	}
+
+	topic := os.Getenv("KAFKA_TOPIC")
+	if topic == "" {
+		topic = "charge-topic"
+	}
+
+	producer := kafka.NewProducer(broker, topic)
 	defer producer.Close()
 
 	msg := model.ChargeMessage{

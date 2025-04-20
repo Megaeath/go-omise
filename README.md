@@ -1,69 +1,86 @@
-# GO-TAMBOON ไปทำบุญ
+# 🧧 Go-Tamboon: Digital Donation Processing System
 
-This is a small challenge project to see how good you are with Go. Included in this
-repository is a CSV list of Song-pah-pa (ซองผ้าป่า). It is a white envelope with money
-inside and the donor name printed on the front. They are usually collected en bulk from
-multiple people in order to round up money to repair or construct new temple buildings.
+**Go-Tamboon** is a modern, scalable donation processing system built with Go, Kafka, MongoDB, and Redis. Inspired by traditional Thai donation practices, this project simulates processing encrypted donation data, emphasizing concurrency, observability, and clean architecture principles.
 
-The idea is that your donation amount should be kept secret les the activity becomes an
-act of flaunting your wealth.
+---
 
-But we're a payment gateway, we can do better than that. The envelope will contain,
-instead, a valid CC number (fake ones, not a real working card) and the desired donation
-amount. The entire list is also encrypted using NSA-proof variant of the
-[Caesar Cipher][1] :troll:
+## 📐 Architecture Overview
 
-### CONTENTS
-
-* `data/fng.csv.rot128` - A ROT-128 encrypted CSV file.
-* `cipher/rot128.go` - Sample ROT-128 encrypt-/decrypter.
-
-### EXERCISE
-
-Write a GO command-line module that, when given the CSV list, calls the [Charge API][0] to
-make donations by creating a charge for each row in the file and produce a summary at the
-end.
-
-Example:
-
-```sh
-$ cd $GOPATH/omise/go-tamboon
-$ go install -v .
-
-$ $GOPATH/bin/go-tamboon test.csv
-
-performing donations...
-done.
-
-        total received: THB  210,000.00
-  successfully donated: THB  200,000.00
-       faulty donation: THB   10,000.00
-
-    average per person: THB      534.23
-            top donors: Obi-wan Kenobi
-                        Luke Skywalker
-                        Kylo Ren
+```plaintext
++-------------+       Kafka        +-------------+        MongoDB
+|             |  ─────────────▶   |             |   ─────────────▶
+|    CLI      |                   |   Worker    |               Log DB
+|  (CSV Load) |◀─────────────┐    | (Consumer)  |◀────────┐
++-------------+              │    +-------------+         │
+                             ▼                          ▲
+                         Kafka Topic                MongoDB
+                           "charge-topic"             (Charge Request Log)
+                             ▲                          ▲
++-------------+              │                          │
+|             |  REST API    │                          │
+|   API       |─────────────▶|                          │
+|   Server    |    Redis (Rate Limit)                   │
++-------------+                                          
 ```
 
-**Requirements:**
+---
 
-* Decrypt the file using a simple [ROT-128][2] algorithm.
-* Make donations by creating a Charge via the [Charge API][0] for each row in the
-  decrypted CSV.
-* Produce a brief summary at the end.
-* Handle errors gracefully, without stopping the entire process.
-* Writes readable and maintainable code.
+## 🚀 Getting Started
 
-**Bonus:**
+### Prerequisites
 
-* Have a good Go package structure.
-* Be a good internet citizen and throttles the API call if we hit rate limit.
-* Run as fast as possible on a multi-core CPU.
-* Allocate as little memory as possible.
-* Complete the entire process without leaving large trace of Credit Card numbers
-  in memory, or on disk.
-* Ensure reproducible builds on your workspace.
+Ensure you have the following installed:
+- [Go](https://golang.org/dl/) (version 1.18 or later)
+- [Kafka](https://kafka.apache.org/quickstart)
+- [MongoDB](https://www.mongodb.com/try/download/community)
+- [Redis](https://redis.io/download)
 
- [0]: https://www.omise.co/charges-api
- [1]: https://en.wikipedia.org/wiki/Caesar_cipher
- [2]: https://play.golang.org/p/dCWYyWPHwj4
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/go-tamboon.git
+   cd go-tamboon
+   ```
+
+2. Install dependencies:
+   ```bash
+   go mod tidy
+   ```
+
+3. Set up environment variables:
+   Create a `.env` file in the root directory and configure the following:
+   ```env
+   KAFKA_BROKER=localhost:9092
+   MONGO_URI=mongodb://localhost:27017
+   REDIS_ADDR=localhost:6379
+   ```
+
+### Running the Project
+
+1. Start Kafka, MongoDB, and Redis services.
+
+2. Run the API server:
+   ```bash
+   go run cmd/api/main.go
+   ```
+
+3. Run the worker:
+   ```bash
+   go run cmd/worker/main.go
+   ```
+
+4. Load sample donation data via the CLI:
+   ```bash
+   go run cmd/cli/main.go ../data/fng.csv 
+   ```
+
+---
+
+## 🧪 Testing
+
+Run unit tests with coverage:
+```bash
+go test -coverprofile=coverage.out ./...
+go tool cover -html=coverage.out
+```

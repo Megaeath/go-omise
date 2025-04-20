@@ -1,4 +1,3 @@
-// internal/kafka/topic.go
 package kafka
 
 import (

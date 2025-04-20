@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"log"
+	"os"
 
 	"go-api/internal/db"
 	"go-api/internal/kafka"
@@ -14,17 +15,28 @@ var RedisClient *redis.Client
 var Ctx = context.Background()
 
 func InitRedis() {
+	addr := os.Getenv("REDIS_HOST")
+	if addr == "" {
+		addr = "localhost:6379"
+	}
+
 	RedisClient = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", // 🔧 Replace if using Docker or external Redis
+		Addr:     addr,
 		Password: "",
 		DB:       0,
 	})
 }
 
 func InitMongo() {
-	// MongoDB connection details
-	mongoURI := "mongodb://localhost:27017" // 🔧 Replace with your MongoDB URI
-	dbName := "go-api"                      // 🔧 Replace with your database name
+	mongoURI := os.Getenv("MONGO_URI")
+	if mongoURI == "" {
+		mongoURI = "mongodb://localhost:27017"
+	}
+
+	dbName := os.Getenv("MONGO_DB_NAME")
+	if dbName == "" {
+		dbName = "go-api"
+	}
 
 	log.Println("Initializing MongoDB...")
 	db.InitMongoDB(mongoURI, dbName)
@@ -32,8 +44,15 @@ func InitMongo() {
 }
 
 func InitKafkaTopic() {
-	broker := "localhost:29092"
-	topic := "charge-topic"
+	broker := os.Getenv("KAFKA_BROKER")
+	if broker == "" {
+		broker = "localhost:29092"
+	}
+
+	topic := os.Getenv("KAFKA_TOPIC")
+	if topic == "" {
+		topic = "charge-topic"
+	}
 
 	log.Println("Initializing Kafka producer...")
 	producer := kafka.NewProducer(broker, topic)
