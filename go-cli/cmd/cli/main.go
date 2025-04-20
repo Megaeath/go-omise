@@ -3,20 +3,28 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"go-cli/internal/chargeclient" // Corrected import path
-	"go-cli/internal/csvreader"    // Corrected import path
-	"go-cli/internal/model"        // Corrected import path
-	"go-cli/internal/summary"      // Corrected import path
+	"go-cli/internal/chargeclient"
+	"go-cli/internal/csvreader"
+	"go-cli/internal/model"
+	"go-cli/internal/summary"
 	"io/ioutil"
 	"os"
 	"sync"
 
+	"github.com/joho/godotenv"
 	"github.com/schollz/progressbar/v3"
 )
 
-const DefaultConcurrency = 5
+const DefaultConcurrency = 20
 
 func main() {
+	// Load environment variables from .env file
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file:", err)
+		os.Exit(1)
+	}
+
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: cli-donation <path-to-file>")
 		os.Exit(1)
@@ -59,13 +67,19 @@ func processDonations(rows []model.DonationRow, concurrency int) []model.Donatio
 	jobs := make(chan int, len(rows))
 	var wg sync.WaitGroup
 
+	host := os.Getenv("CHARGE_API_HOST")
+	if host == "" {
+		fmt.Println("Environment variable CHARGE_API_HOST is not set")
+		os.Exit(1)
+	}
+
 	for w := 0; w < concurrency; w++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			for i := range jobs {
 				row := rows[i]
-				ok, err := chargeclient.SendCharge(row)
+				ok, err := chargeclient.SendCharge(row, host) // Pass host to SendCharge
 
 				results[i] = model.DonationResult{
 					Row:     row,
