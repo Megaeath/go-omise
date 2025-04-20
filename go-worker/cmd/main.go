@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	broker := "localhost:9092"
+	broker := "localhost:29092"
 	topic := "charge-topic"
 	group := "charge-consumer"
 	workers := 5

@@ -39,7 +39,7 @@ func ChargeHandler(c *gin.Context) {
 		return
 	}
 
-	producer := kafka.NewProducer("localhost:9092", "charge-topic") // Replace with your broker and topic
+	producer := kafka.NewProducer("localhost:29092", "charge-topic") // Replace with your broker and topic
 	defer producer.Close()
 
 	msg := model.ChargeMessage{

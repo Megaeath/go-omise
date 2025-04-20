@@ -32,7 +32,7 @@ func InitMongo() {
 }
 
 func InitKafkaTopic() {
-	broker := "localhost:9092"
+	broker := "localhost:29092"
 	topic := "charge-topic"
 
 	log.Println("Initializing Kafka producer...")
