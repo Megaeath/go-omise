@@ -8,11 +8,31 @@ import (
 	"go-api/internal/db"
 	"go-api/internal/kafka"
 
+	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 )
 
 var RedisClient *redis.Client
 var Ctx = context.Background()
+
+func LoadEnv() {
+	env := os.Getenv("APP_ENV")
+	if env == "" {
+		env = "local"
+	}
+
+	var envFile string
+	if env == "docker" {
+		envFile = "env.docker"
+	} else {
+		envFile = ".env.local"
+	}
+
+	err := godotenv.Load(envFile)
+	if err != nil {
+		log.Printf("No %s file found or failed to load: %v", envFile, err)
+	}
+}
 
 func InitRedis() {
 	addr := os.Getenv("REDIS_HOST")

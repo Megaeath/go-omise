@@ -2,10 +2,9 @@ package csvreader
 
 import (
 	"encoding/csv"
+	"go-cli/internal/model"
 	"io"
 	"strconv"
-
-	"go-cli/internal/model"
 )
 
 func ParseCSV(r io.Reader) ([]model.DonationRow, error) {
@@ -24,6 +23,7 @@ func ParseCSV(r io.Reader) ([]model.DonationRow, error) {
 		}
 		amt64, _ := strconv.ParseInt(rec[1], 10, 64)
 		amt := int(amt64)
+
 		rows = append(rows, model.DonationRow{
 			Name:           rec[0],
 			AmountSubunits: amt,

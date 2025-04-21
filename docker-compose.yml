@@ -36,7 +36,32 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-
-
+  go-api:
+    build:
+      context: ./go-api
+      dockerfile: Dockerfile
+    env_file:
+      - ./go-api/.env.docker
+    environment:
+      - APP_ENV=docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+      - mongo
+      - redis
+  # # Worker Service
+  go-worker:
+    build:
+      context: ./go-worker
+      dockerfile: Dockerfile
+    env_file:
+      - ./go-worker/.env.docker
+    environment:
+      - APP_ENV=docker 
+    container_name: go-worker
+    depends_on:
+      - kafka
+      - mongo
 volumes:
   mongo-data:
