@@ -21,6 +21,10 @@ Ensure you have the following installed:
 - [MongoDB](https://www.mongodb.com/try/download/community)
 - [Redis](https://redis.io/download)
 
+Prometheus: http://localhost:9090
+
+Grafana: http://localhost:3000
+
 ### Installation
 
 1. Clone the repository:
