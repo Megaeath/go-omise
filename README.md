@@ -94,11 +94,11 @@ Grafana: http://localhost:3000
 
 ## 🖼️ Screenshot
 
-![Application Screenshot](path/to/your/screenshot01.jpeg)
+![Application Screenshot](screenshot/screenshot01.jpeg)
 
-![Docker Screenshot](path/to/your/screenshot02.png)
+![Docker Screenshot](screenshot/screenshot02.png)
 
-![Monitoring Screenshot](path/to/your/screenshot03.png)
+![Monitoring Screenshot](screenshot/screenshot03.png)
 
 ## 🧪 Testing
 
