@@ -45,6 +45,18 @@ Grafana: http://localhost:3000
    MONGO_URI=mongodb://localhost:27017
    REDIS_ADDR=localhost:6379
    ```
+
+### Monitoring with Prometheus and Grafana
+
+1. Access Prometheus:
+   - Open your browser and navigate to [http://localhost:9090](http://localhost:9090).
+   - Use Prometheus to query metrics and monitor the system's performance.
+
+2. Access Grafana:
+   - Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
+   - Log in with the default credentials (`admin`/`admin`) and configure your data source to connect to Prometheus.
+   - Import or create dashboards to visualize system metrics.
+
 ### Running the Project with Docker Compose
 
 1. Start all services using Docker Compose:
@@ -80,7 +92,13 @@ Grafana: http://localhost:3000
    go run cmd/cli/main.go ../data/fng.csv 
    ```
 
+## 🖼️ Screenshot
 
+![Application Screenshot](path/to/your/screenshot01.jpeg)
+
+![Docker Screenshot](path/to/your/screenshot02.png)
+
+![Monitoring Screenshot](path/to/your/screenshot03.png)
 
 ## 🧪 Testing
 
